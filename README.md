@@ -1,62 +1,93 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# API Backend - Gestión de Usuarios y Mascotas
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este proyecto es una API RESTful desarrollada en Laravel para la gestión de usuarios y mascotas, con autenticación JWT y control de acceso mediante middlewares personalizados. A continuación se describen los endpoints, middlewares, autenticación y detalles relevantes para el equipo frontend.
 
-## About Laravel
+## Autenticación JWT
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+La API utiliza JWT (JSON Web Token) para la autenticación de usuarios. Los tokens se generan al iniciar sesión y deben ser enviados en la cabecera `Authorization: Bearer <token>` en cada petición protegida.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Registro:** `POST /api/registro`
+- **Login:** `POST /api/login`
+- **Logout:** `POST /api/logout` (requiere token)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Al iniciar sesión correctamente, se devuelve un token JWT que debe usarse en las siguientes peticiones.
 
-## Learning Laravel
+## Middlewares Personalizados
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. IsAuthenticated
+- Ubicación: `app/Http/Middleware/IsAuthenticated.php`
+- Función: Protege rutas que requieren usuario autenticado. Verifica que el token JWT sea válido y que el usuario exista.
+- Respuesta en caso de fallo:** 401 Unauthorized, mensaje: `Unauthorized invalid token`.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. IsUserAdmin
+- Ubicación: `app/Http/Middleware/IsUserAdmin.php`
+- Función: Permite el acceso solo a usuarios con rol `admin`.
+- Respuesta en caso de fallo: 403 Forbidden, mensaje: `Unauthorized, you are not an admin`.
 
-## Laravel Sponsors
+## Endpoints Disponibles
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+### Usuarios (solo admin)
+- `GET /api/users` - Listar todos los usuarios
+- `GET /api/users/{id}` - Ver detalles de un usuario
+- `PUT /api/users/{id}` - Editar usuario
+- `DELETE /api/users/{id}` - Eliminar usuario
+- `GET /api/users/{id}/pets` - Listar mascotas de un usuario
 
-### Premium Partners
+### Mascotas (usuario autenticado)
+- `GET /api/pets` - Listar mascotas del usuario autenticado
+- `POST /api/pets` - Crear nueva mascota
+- `PUT /api/pets/{id}` - Editar mascota (solo si es propietario)
+- `PATCH /api/pets/{id}` - Modificar parcialmente mascota (solo si es propietario)
+- `DELETE /api/pets/{id}` - Eliminar mascota (solo si es propietario)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
+#### Notas de Seguridad:
+- Un usuario solo puede editar o eliminar sus propias mascotas. Si intenta modificar una mascota de otro usuario, recibirá un error 403.
+- Los endpoints de usuario solo pueden ser accedidos por administradores.
 
-## Contributing
+## Ejemplo de uso de JWT
+1. Registrar usuario:
+   ```http
+   POST /api/registro
+   {
+     "name": "Juan",
+     "email": "juan@ejemplo.com",
+     "password": "123456",
+     "rol": "user"
+   }
+   ```
+2. Login:
+   ```http
+   POST /api/login
+   {
+     "email": "juan@ejemplo.com",
+     "password": "123456"
+   }
+   ```
+   Respuesta:
+   ```json
+   {
+     "message": "Inicio de sesión exitoso",
+     "token": "<JWT_TOKEN>"
+   }
+   ```
+3. Usar el token en peticiones protegidas:
+   ```http
+   GET /api/pets
+   Authorization: Bearer <JWT_TOKEN>
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Estructura de Roles
+- **user:** Acceso a sus propias mascotas.
+- **admin:** Acceso total a usuarios y mascotas de cualquier usuario.
 
-## Code of Conduct
+## Migraciones y Modelos
+- **User:** Incluye campos `name`, `email`, `password`, `rol`.
+- **Mascota:** Incluye campos `name`, `url`, `description`, `user_id` (relación con usuario).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Respuestas de Error
+- 401: Token inválido o no enviado.
+- 403: Acceso denegado por permisos o rol.
+- 404: Recurso no encontrado.
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Contacto
+Para dudas técnicas, contactar con el equipo backend.
