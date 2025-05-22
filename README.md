@@ -93,4 +93,4 @@ Usuario autorizado -> email: sula@gmail.com, password: Aptitude01
 Usuario admin -> email: admiin@gmail.com, password: APTItude01
 
 ## Contacto
-Para dudas técnicas, contactar con el equipo backend.
+Para dudas técnicas, contactar a mi email: sulat3821@gmail.com.
