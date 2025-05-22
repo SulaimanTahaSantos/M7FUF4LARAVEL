@@ -1,0 +1,25 @@
+[phases.setup]
+nixPkgs = ["php", "nodejs", "yarn", "composer"]
+
+[phases.install]
+cmds = [
+  "composer install",
+  "npm install",
+  "npm run build"
+]
+
+[phases.build]
+cmds = [
+  "php artisan optimize",
+  "php artisan config:cache",
+  "php artisan route:cache",
+  "php artisan view:cache",
+  "php artisan migrate --force",
+  "php artisan storage:link"
+]
+
+[start]
+cmd = "php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"
+
+[variables]
+PORT = "8000"
