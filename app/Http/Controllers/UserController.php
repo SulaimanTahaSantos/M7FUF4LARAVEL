@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Hash;
+
 
 
 class UserController extends Controller
@@ -57,6 +60,44 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
     }
+public function inicioSesion(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
+
+    $user = User::where('email', $request->input('email'))->first();
+
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json(['message' => 'Credenciales inválidas'], 401);
+    }
+
+    $credentials = $request->only('email', 'password');
+    try{
+        if(!$token = JWTAuth::attempt($credentials)){
+            return response()->json(['error' => 'invalid_credentials'], 401);
+        }
+        return response()->json([
+            'message' => 'Inicio de sesión exitoso',
+            'token' => $token,
+        ],200);
+    }catch (JWTException $e){
+        return response()->json([
+            'error' => 'could_not_create_token',
+            'message'=> $e->getMessage(),
+
+        ], 500);
+    }
+}
+public function logout(){
+    try {
+        JWTAuth::invalidate(JWTAuth::getToken());
+        return response()->json(['message' => 'Logout exitoso'], 200);
+    } catch (JWTException $e) {
+        return response()->json(['error' => 'No se pudo cerrar sesión'], 500);
+    }
+}
 
     public function getJWTIdentifier()
     {
@@ -67,6 +108,8 @@ class UserController extends Controller
     {
         return [];
     }
+
+
 
 
 

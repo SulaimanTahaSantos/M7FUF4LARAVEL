@@ -14,7 +14,14 @@ class IsAuthenticated
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
-    {
+   {
+        if(auth('api')->user()){
         return $next($request);
+
+        }else{
+            return response()->json([
+                'message' => 'Unauthorized invalid token'
+            ],401);
+        }
     }
 }
