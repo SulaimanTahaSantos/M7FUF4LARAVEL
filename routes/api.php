@@ -16,11 +16,13 @@ use App\Http\Middleware\IsAuthenticated;
 
 Route::post('/registro', [UserController::class, 'store']);
 Route::post('/login', [UserController::class, 'inicioSesion']);
+Route::get('/users', [UserController::class, 'index']);
+
 
 
 
 Route::middleware([IsUserAdmin::class])->group(function(){
-    Route::get('/users', [UserController::class, 'index']);
+    // Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{id}', [UserController::class, 'show']);
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
