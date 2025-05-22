@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+
 
 class UserController extends Controller
 {
@@ -54,6 +56,16 @@ class UserController extends Controller
         } else {
             return response()->json(['message' => 'User not found'], 404);
         }
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 
 
