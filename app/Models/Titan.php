@@ -5,24 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LenguajesDeProgramacion extends Model
+class Titan extends Model
 {
     use HasFactory;
+
+    protected $table = 'titanes';
 
     protected $fillable = [
         'nombre',
         'descripcion',
-        'creador',
-        'fecha_lanzamiento',
+        'portador',
+        'altura',
+        'habilidades',
         'tipo',
-        'url'
+        'imagen_url'
     ];
 
-    /**
-     * Get the route key for the model.
-     */
-    public function getRouteKeyName()
-    {
-        return 'id';
-    }
+    protected $casts = [
+        'altura' => 'decimal:2'
+    ];
 }

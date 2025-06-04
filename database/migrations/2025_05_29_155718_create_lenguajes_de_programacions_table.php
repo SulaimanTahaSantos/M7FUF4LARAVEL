@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('creador')->nullable();
             $table->date('fecha_lanzamiento')->nullable();
             $table->string('tipo')->nullable();
+            $table->string('url')->nullable();
             $table->timestamps();
         });
     }

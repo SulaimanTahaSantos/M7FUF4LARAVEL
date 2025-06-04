@@ -12,7 +12,8 @@ class LenguajesDeProgramacionController extends Controller
      */
     public function index()
     {
-        //
+        $lenguajes = LenguajesDeProgramacion::all();
+        return view('lenguajesdeprogramacion.index', compact('lenguajes'));
     }
 
     /**
@@ -20,7 +21,7 @@ class LenguajesDeProgramacionController extends Controller
      */
     public function create()
     {
-        //
+        return view('lenguajesdeprogramacion.create');
     }
 
     /**
@@ -28,7 +29,18 @@ class LenguajesDeProgramacionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'creador' => 'required|string|max:255',
+            'fecha_lanzamiento' => 'required|date',
+            'tipo' => 'required|string|max:255',
+            'url' => 'nullable|string|max:255'
+        ]);
+
+        LenguajesDeProgramacion::create($request->all());
+
+        return redirect()->route('lenguajesdeprogramacion.index')->with('success', 'Lenguaje de programación creado correctamente!');
     }
 
     /**
@@ -36,7 +48,7 @@ class LenguajesDeProgramacionController extends Controller
      */
     public function show(LenguajesDeProgramacion $lenguajesDeProgramacion)
     {
-        //
+        return view('lenguajesdeprogramacion.show', compact('lenguajesDeProgramacion'));
     }
 
     /**
@@ -44,7 +56,7 @@ class LenguajesDeProgramacionController extends Controller
      */
     public function edit(LenguajesDeProgramacion $lenguajesDeProgramacion)
     {
-        //
+        return view('lenguajesdeprogramacion.edit', compact('lenguajesDeProgramacion'));
     }
 
     /**
@@ -52,7 +64,18 @@ class LenguajesDeProgramacionController extends Controller
      */
     public function update(Request $request, LenguajesDeProgramacion $lenguajesDeProgramacion)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'creador' => 'required|string|max:255',
+            'fecha_lanzamiento' => 'required|date',
+            'tipo' => 'required|string|max:255',
+            'url' => 'nullable|string|max:255'
+        ]);
+
+        $lenguajesDeProgramacion->update($request->all());
+
+        return redirect()->route('lenguajesdeprogramacion.index')->with('success', 'Lenguaje de programación actualizado correctamente!');
     }
 
     /**
@@ -60,6 +83,7 @@ class LenguajesDeProgramacionController extends Controller
      */
     public function destroy(LenguajesDeProgramacion $lenguajesDeProgramacion)
     {
-        //
+        $lenguajesDeProgramacion->delete();
+        return redirect()->route('lenguajesdeprogramacion.index')->with('success', 'Lenguaje de programación eliminado correctamente!');
     }
 }
